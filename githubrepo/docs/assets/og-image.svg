@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#04070D"/>
+      <stop offset="50%" stop-color="#070B13"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    
+    <radialGradient id="cyanGlow" cx="20%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#00F0FF" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00F0FF" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="emeraldGlow" cx="80%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#00F0FF"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+
+    <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#082F49"/>
+      <stop offset="100%" stop-color="#064E3B"/>
+    </linearGradient>
+
+    <!-- Pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#cyanGlow)"/>
+  <rect width="1200" height="630" fill="url(#emeraldGlow)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Tactical Radar Circles -->
+  <circle cx="980" cy="315" r="240" fill="none" stroke="rgba(0, 240, 255, 0.08)" stroke-width="1.5" stroke-dasharray="6 6"/>
+  <circle cx="980" cy="315" r="160" fill="none" stroke="rgba(0, 240, 255, 0.12)" stroke-width="1.5"/>
+  <circle cx="980" cy="315" r="80" fill="none" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1.5"/>
+  <line x1="740" y1="315" x2="1220" y2="315" stroke="rgba(0, 240, 255, 0.08)" stroke-width="1"/>
+  <line x1="980" y1="75" x2="980" y2="555" stroke="rgba(0, 240, 255, 0.08)" stroke-width="1"/>
+
+  <!-- Left Content -->
+  <g transform="translate(100, 140)">
+    <!-- Top Pill -->
+    <rect x="0" y="0" width="360" height="34" rx="17" fill="rgba(0, 240, 255, 0.1)" stroke="rgba(0, 240, 255, 0.4)" stroke-width="1"/>
+    <circle cx="18" cy="17" r="5" fill="#10B981"/>
+    <text x="34" y="22" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#00F0FF" letter-spacing="1.5">OFFLINE-FIRST • ZERO-CLOUD • GPL-3.0</text>
+
+    <!-- Main Title -->
+    <text x="0" y="110" font-family="'Inter', sans-serif" font-size="76" font-weight="900" fill="url(#textGrad)" letter-spacing="-1">SILOUDER</text>
+    
+    <!-- Subtitle -->
+    <text x="0" y="165" font-family="'Inter', sans-serif" font-size="24" font-weight="600" fill="#F1F5F9">Decentralized Multi-Transport Mesh Communicator</text>
+    <text x="0" y="200" font-family="'Inter', sans-serif" font-size="18" font-weight="400" fill="#94A3B8">Private, encrypted messaging when cell towers and internet are unavailable.</text>
+
+    <!-- Feature Pills -->
+    <g transform="translate(0, 250)">
+      <!-- Bluetooth P2P -->
+      <rect x="0" y="0" width="160" height="38" rx="8" fill="#1E293B" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1"/>
+      <text x="20" y="24" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#00F0FF">BLUETOOTH P2P</text>
+
+      <!-- LAN Sockets -->
+      <rect x="175" y="0" width="160" height="38" rx="8" fill="#1E293B" stroke="rgba(74, 222, 128, 0.3)" stroke-width="1"/>
+      <text x="195" y="24" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#4ADE80">LAN SOCKETS</text>
+
+      <!-- LoRa Mesh -->
+      <rect x="350" y="0" width="150" height="38" rx="8" fill="#1E293B" stroke="rgba(56, 189, 248, 0.3)" stroke-width="1"/>
+      <text x="375" y="24" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#38BDF8">LORA MESH</text>
+
+      <!-- Tor Onion -->
+      <rect x="515" y="0" width="150" height="38" rx="8" fill="#1E293B" stroke="rgba(192, 132, 252, 0.3)" stroke-width="1"/>
+      <text x="540" y="24" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#C084FC">TOR ONION v3</text>
+    </g>
+
+    <!-- Bottom Specs -->
+    <g transform="translate(0, 330)">
+      <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="13" fill="#64748B">AEAD AES-256-GCM • HMAC-SHA256 • ROOM SQLITE • JETPACK COMPOSE • ANDROID 7.0+</text>
+      <text x="0" y="24" font-family="'JetBrains Mono', monospace" font-size="13" fill="#10B981">github.com/soms3r/silouder</text>
+    </g>
+  </g>
+
+  <!-- Right Logo Badge -->
+  <g transform="translate(930, 265)">
+    <rect x="-60" y="-60" width="120" height="120" rx="28" fill="url(#shieldGrad)" stroke="#00F0FF" stroke-width="2.5"/>
+    <path d="M 0 -35 L 28 -20 L 28 8 C 28 25 15 38 0 44 C -15 38 -28 25 -28 8 L -28 -20 Z" fill="none" stroke="#00F0FF" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="0" cy="5" r="8" fill="#10B981"/>
+  </g>
+</svg>

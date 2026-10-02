@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Silouder</string>
+    <string name="title_messages">Messages</string>
+    <string name="title_bluetooth">Nearby Bluetooth</string>
+    <string name="title_network">Online Network</string>
+    <string name="title_mesh">Mesh Topology</string>
+    <string name="title_radio">Radio &amp; Hardware</string>
+    <string name="title_queue">Outbox Queue</string>
+    <string name="title_keys">Key Ring</string>
+    <string name="title_terminal">Packet Inspector</string>
+</resources>

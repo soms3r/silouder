@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silouder — Offline-First Multi-Transport Communicator</title>
+  <meta name="description" content="Decentralized, zero-infrastructure offline Android communicator combining Bluetooth P2P, LAN sockets, LoRa mesh, and Tor onion routing.">
+  <meta name="theme-color" content="#070B13">
+
+  <!-- Open Graph & Social Cards -->
+  <meta property="og:title" content="Silouder — Offline-First Multi-Transport Communicator">
+  <meta property="og:description" content="Decentralized Android messaging over Bluetooth P2P, LAN sockets, LoRa mesh, and Tor onion routing. Designed for emergencies and everyday off-grid life.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://soms3r.github.io/silouder/">
+  <meta property="og:image" content="https://soms3r.github.io/silouder/assets/og-image.svg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://soms3r.github.io/silouder/assets/og-image.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tactical Style -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="cyber-grid-overlay"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="logo-text">SILOUDER<span>.APP</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#everyday">Everyday Life</a></li>
+          <li><a href="#transports">Transports</a></li>
+          <li><a href="#security">Security</a></li>
+          <li><a href="#specs">Specifications</a></li>
+          <li><a href="#download">Download APK</a></li>
+          <li><a href="https://github.com/soms3r/silouder" target="_blank" rel="noopener">GitHub</a></li>
+          <li>
+            <a href="#download" class="btn-nav-download">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Get APK
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero container">
+    <div class="hero-content">
+      <div class="hero-pill">
+        <div class="pulse-dot"></div>
+        <span>OFFLINE-FIRST • ZERO-INFRASTRUCTURE • GPL-3.0</span>
+      </div>
+
+      <h1 class="hero-title">
+        Decentralized Messaging <br>
+        <span class="gradient-text">When Nothing Else Works.</span>
+      </h1>
+
+      <p class="hero-desc">
+        Silouder is a privacy-first, zero-cloud Android communicator engineered for emergency communication, remote expeditions, and disaster zones. It dispatches encrypted messages seamlessly across <strong>Bluetooth P2P</strong>, <strong>LAN sockets</strong>, <strong>LoRa Meshtastic radio</strong>, and <strong>Tor onion circuits</strong> without cellular towers or internet.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#download" class="btn-primary" data-download-apk>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download APK (v1.0.0)
+        </a>
+
+        <a href="#" class="btn-secondary" data-repo-link target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+          Source Code
+        </a>
+      </div>
+
+      <div class="hero-meta-badges">
+        <span class="meta-badge">✓ Android 7.0+ (minSdk 24)</span>
+        <span class="meta-badge">✓ Zero Google Services</span>
+        <span class="meta-badge">✓ 100% Free Software (GPL-3.0)</span>
+        <span class="meta-badge">✓ APK Size: 17.8 MB</span>
+      </div>
+    </div>
+
+    <!-- Live Tactical HUD Mockup -->
+    <div class="device-frame-container">
+      <div class="phone-mockup">
+        <div class="phone-header">
+          <div class="hud-title">SILOUDER</div>
+          <div class="hud-status-pill">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981;"></span>
+            E2EE ACTIVE
+          </div>
+        </div>
+
+        <!-- Identity Card -->
+        <div class="mockup-card">
+          <div class="mockup-identity-label">CRYPTO IDENTITY (OFFLINE)</div>
+          <div class="mockup-node-id">!7A9F1B2C</div>
+          <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+            <div class="mockup-onion">vanguard7x49...onion</div>
+            <div style="font-family: var(--font-mono); font-size: 0.68rem; color: #4ADE80;">192.168.1.105:8888</div>
+          </div>
+        </div>
+
+        <!-- 2x2 Transports -->
+        <div class="mockup-grid">
+          <div class="mini-transport">
+            <div class="mini-transport-top">
+              <span class="mini-transport-name">Nearby BT</span>
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981;"></span>
+            </div>
+            <div class="mini-transport-sub" style="color: #00F0FF;">3 Briar peers</div>
+          </div>
+
+          <div class="mini-transport">
+            <div class="mini-transport-top">
+              <span class="mini-transport-name">Online Net</span>
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981;"></span>
+            </div>
+            <div class="mini-transport-sub" style="color: #4ADE80;">Sockets online</div>
+          </div>
+
+          <div class="mini-transport">
+            <div class="mini-transport-top">
+              <span class="mini-transport-name">LoRa SX1262</span>
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #38BDF8;"></span>
+            </div>
+            <div class="mini-transport-sub" style="color: #38BDF8;">915MHz • Mesh</div>
+          </div>
+
+          <div class="mini-transport">
+            <div class="mini-transport-top">
+              <span class="mini-transport-name">Tor Onion</span>
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #C084FC;"></span>
+            </div>
+            <div class="mini-transport-sub" style="color: #C084FC;">v3 Hidden circuit</div>
+          </div>
+        </div>
+
+        <!-- Live Wire Feed -->
+        <div class="mockup-wire">
+          <div class="mockup-wire-header">
+            <span>LIVE WIRE ACTIVITY</span>
+            <span style="color: #00F0FF;">STREAMING</span>
+          </div>
+          <div id="mockup-wire-list">
+            <div class="wire-item">
+              <div>
+                <span class="wire-direction" style="background: #00F0FF;"></span>
+                <span style="color: #F1F5F9; font-weight: bold;">!7a9f &rarr; !e4b2</span>
+                <span style="color: #94A3B8; margin-left: 6px;">VECTOR_GOSSIP_REQ</span>
+              </div>
+              <div style="color: #00F0FF; font-weight: 700;">12.4dB</div>
+            </div>
+            <div class="wire-item">
+              <div>
+                <span class="wire-direction" style="background: #F59E0B;"></span>
+                <span style="color: #F1F5F9; font-weight: bold;">!7a9f &rarr; !f01c</span>
+                <span style="color: #94A3B8; margin-left: 6px;">ENVELOPE_AES256</span>
+              </div>
+              <div style="color: #38BDF8; font-weight: 700;">8.6dB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Everyday & Urban Life Use Cases -->
+  <section id="everyday" class="use-cases-section container">
+    <div class="section-header">
+      <div class="section-tag" style="color: #10B981;">EVERYDAY APPLICATIONS</div>
+      <h2 class="section-title">Built for Daily Life &amp; Real Scenarios</h2>
+      <p class="section-subtitle">
+        Silouder isn't just for extreme survivalists. It solves common, everyday communication frustrations whenever cell towers are congested, roaming is expensive, or signals drop.
+      </p>
+    </div>
+
+    <div class="use-cases-grid">
+      <!-- Card 1: Stadiums & Festivals -->
+      <div class="use-case-card" style="--card-accent: #00F0FF;">
+        <div class="use-case-header">
+          <div class="use-case-icon" style="background: rgba(0, 240, 255, 0.1); color: #00F0FF;">
+            🎪
+          </div>
+          <span class="use-case-badge" style="background: rgba(0, 240, 255, 0.15); color: #00F0FF;">CONGESTION PROOF</span>
+        </div>
+        <h3>Concerts, Festivals &amp; Stadiums</h3>
+        <p>When 50,000+ people crowd a concert or match, cellular data grinds to a halt. Silouder bypasses overloaded cell towers by hopping directly between nearby phones via Bluetooth P2P so you never lose your friends in the crowd.</p>
+        <div class="use-case-footer">
+          <span>⚡ Transport: Bluetooth LE Gossip</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Hiking & Camping -->
+      <div class="use-case-card" style="--card-accent: #38BDF8;">
+        <div class="use-case-header">
+          <div class="use-case-icon" style="background: rgba(56, 189, 248, 0.1); color: #38BDF8;">
+            🌲
+          </div>
+          <span class="use-case-badge" style="background: rgba(56, 189, 248, 0.15); color: #38BDF8;">OFF-GRID TRAILS</span>
+        </div>
+        <h3>Hiking, Camping &amp; Road Trips</h3>
+        <p>Stay coordinated in state parks, remote valleys, and mountain trails where mobile coverage drops to zero. Pair with an external LoRa radio for multi-mile range or use direct Bluetooth between group members without satellite fees.</p>
+        <div class="use-case-footer">
+          <span>⚡ Transport: LoRa 915MHz &amp; BT</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Commuter Tunnels & Flights -->
+      <div class="use-case-card" style="--card-accent: #4ADE80;">
+        <div class="use-case-header">
+          <div class="use-case-icon" style="background: rgba(74, 222, 128, 0.1); color: #4ADE80;">
+            🚇
+          </div>
+          <span class="use-case-badge" style="background: rgba(74, 222, 128, 0.15); color: #4ADE80;">IN-TRANSIT</span>
+        </div>
+        <h3>Subways, Tunnels &amp; Airplane Mode</h3>
+        <p>Commuting deep underground in subway trains or cruising at 35,000 feet in airplane mode? With Bluetooth or local Wi-Fi enabled, keep texting travel buddies sitting carriages or rows away without paying for expensive in-flight Wi-Fi.</p>
+        <div class="use-case-footer">
+          <span>⚡ Transport: Bluetooth / Ad-hoc Wi-Fi</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Storms & Home ISP Blackouts -->
+      <div class="use-case-card" style="--card-accent: #F59E0B;">
+        <div class="use-case-header">
+          <div class="use-case-icon" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;">
+            ⛈️
+          </div>
+          <span class="use-case-badge" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">STORM RESILIENT</span>
+        </div>
+        <h3>Storm Blackouts &amp; Home ISP Outages</h3>
+        <p>When storms knock out broadband cables or your internet provider goes down, Silouder leverages your battery-backed home router or phone hotspot to maintain instant messaging across rooms, floors, and neighboring apartments.</p>
+        <div class="use-case-footer">
+          <span>⚡ Transport: Local LAN Sockets (8888)</span>
+        </div>
+      </div>
+
+      <!-- Card 5: Campus & Workplace Privacy -->
+      <div class="use-case-card" style="--card-accent: #A855F7;">
+        <div class="use-case-header">
+          <div class="use-case-icon" style="background: rgba(168, 85, 247, 0.1); color: #A855F7;">
+            🎓
+          </div>
+          <span class="use-case-badge" style="background: rgba(168, 85, 247, 0.15); color: #A855F7;">PRIVATE &amp; LOCAL</span>
+        </div>
+        <h3>Campus, Dorms &amp; Private Workspaces</h3>
+        <p>Chat with classmates in lecture halls or coworkers in open offices without logging into centralized chat servers. Messages are encrypted with AES-256-GCM and never leave your local physical environment.</p>
+        <div class="use-case-footer">
+          <span>⚡ Transport: End-to-End Encrypted LAN</span>
+        </div>
+      </div>
+
+      <!-- Card 6: Travel Abroad Without Roaming -->
+      <div class="use-case-card" style="--card-accent: #C084FC;">
+        <div class="use-case-header">
+          <div class="use-case-icon" style="background: rgba(192, 132, 252, 0.1); color: #C084FC;">
+            ✈️
+          </div>
+          <span class="use-case-badge" style="background: rgba(192, 132, 252, 0.15); color: #C084FC;">ZERO ROAMING FEE</span>
+        </div>
+        <h3>International Travel Without Roaming</h3>
+        <p>Arriving at foreign airports or exploring historical city centers without paying for international roaming data packs? Keep your travel group connected offline at hotels, museums, and landmarks completely free.</p>
+        <div class="use-case-footer">
+          <span>⚡ Transport: Proximity P2P Mesh</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Multi-Transport Deep Dive -->
+  <section id="transports" class="container" style="padding-top: 40px;">
+    <div class="section-header">
+      <div class="section-tag">MULTI-TRANSPORT LAYERS</div>
+      <h2 class="section-title">Zero-Infrastructure Routing</h2>
+      <p class="section-subtitle">
+        Silouder does not rely on a single communication channel. An intelligent transport router continuously tests available links and routes encrypted packets across the most efficient path.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <!-- Bluetooth P2P -->
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background: rgba(0, 240, 255, 0.1); color: #00F0FF; border: 1px solid rgba(0, 240, 255, 0.3);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/>
+          </svg>
+        </div>
+        <h3>Nearby Bluetooth P2P</h3>
+        <p>Briar-inspired proximity discovery and offline peer-to-peer sync. Exchanges message vectors when physical peers are within Bluetooth range without ever touching the internet.</p>
+        <div class="feature-badge-row">
+          <span class="feature-tech-tag">BLE Advertising</span>
+          <span class="feature-tech-tag">Gossip Vectors</span>
+          <span class="feature-tech-tag">Zero Tower</span>
+        </div>
+      </div>
+
+      <!-- Online LAN / Sockets -->
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background: rgba(74, 222, 128, 0.1); color: #4ADE80; border: 1px solid rgba(74, 222, 128, 0.3);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+            <line x1="6" y1="6" x2="6.01" y2="6"/>
+            <line x1="6" y1="18" x2="6.01" y2="18"/>
+          </svg>
+        </div>
+        <h3>Online LAN Sockets</h3>
+        <p>Direct peer sockets over WiFi, ad-hoc hotspots, or reachable local IPs on port 8888. Allows ultra-fast high-throughput sync across local networks without central chat servers.</p>
+        <div class="feature-badge-row">
+          <span class="feature-tech-tag">TCP Sockets</span>
+          <span class="feature-tech-tag">Port 8888</span>
+          <span class="feature-tech-tag">Zero Cloud Server</span>
+        </div>
+      </div>
+
+      <!-- LoRa Radio Mesh -->
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background: rgba(56, 189, 248, 0.1); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 11a9 9 0 0 1 9 9"/>
+            <path d="M4 4a16 16 0 0 1 16 16"/>
+            <circle cx="5" cy="19" r="1"/>
+          </svg>
+        </div>
+        <h3>LoRa Radio Mesh (Meshtastic)</h3>
+        <p>Integrates with external SX1262 LoRa hardware modems via BLE. Supports long-range sub-GHz packet broadcast, multi-hop mesh repeaters, and packet MTU fragmentation.</p>
+        <div class="feature-badge-row">
+          <span class="feature-tech-tag">SX1262 Modem</span>
+          <span class="feature-tech-tag">915 / 868 MHz</span>
+          <span class="feature-tech-tag">Meshtastic BLE</span>
+        </div>
+      </div>
+
+      <!-- Tor Onion Routing -->
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background: rgba(192, 132, 252, 0.1); color: #C084FC; border: 1px solid rgba(192, 132, 252, 0.3);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h3>Tor v3 Onion Sockets</h3>
+        <p>End-to-end anonymous circuits over Tor. Deterministically derives v3 onion addresses from node identity keys, providing censorship-resistant routing when the global web is censored.</p>
+        <div class="feature-badge-row">
+          <span class="feature-tech-tag">Tor v3 Onion</span>
+          <span class="feature-tech-tag">Anonymity</span>
+          <span class="feature-tech-tag">Anti-Censorship</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security & Architecture Section -->
+  <section id="security" class="security-section">
+    <div class="container security-layout">
+      <div>
+        <div class="section-tag">MIL-GRADE CRYPTOGRAPHY</div>
+        <h2 class="section-title">End-to-End Encrypted by Default</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 28px;">
+          Every byte transmitted by Silouder is encrypted locally before ever touching a radio or socket transport. Even intermediate mesh repeater nodes only see ciphertext.
+        </p>
+
+        <ul class="security-points">
+          <li class="security-point">
+            <div class="security-point-icon">✓</div>
+            <div class="security-point-content">
+              <h4>AES-256-GCM AEAD</h4>
+              <p>Authenticated encryption with associated data provides both confidentiality and cryptographic tamper protection.</p>
+            </div>
+          </li>
+
+          <li class="security-point">
+            <div class="security-point-icon">✓</div>
+            <div class="security-point-content">
+              <h4>HMAC-SHA256 Signatures</h4>
+              <p>Tamper-proof packet verification ensures data cannot be forged or altered in transit by rogue mesh repeaters.</p>
+            </div>
+          </li>
+
+          <li class="security-point">
+            <div class="security-point-icon">✓</div>
+            <div class="security-point-content">
+              <h4>Local Identity Key Derivation</h4>
+              <p>Identities are generated entirely offline on your device using cryptographic entropy. No phone number, email, or account needed.</p>
+            </div>
+          </li>
+
+          <li class="security-point">
+            <div class="security-point-icon">✓</div>
+            <div class="security-point-content">
+              <h4>Zero Cloud & Zero Telemetry</h4>
+              <p>No analytics, no trackers, no Google Play Services dependency. 100% compliant with F-Droid and GPL-3.0 standards.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Code Inspector Box -->
+      <div id="specs" class="terminal-window">
+        <div class="terminal-topbar">
+          <div class="terminal-dots">
+            <div class="terminal-dot dot-red"></div>
+            <div class="terminal-dot dot-yellow"></div>
+            <div class="terminal-dot dot-green"></div>
+          </div>
+          <div class="terminal-title">CryptoEngine.kt &bull; AES-256-GCM AEAD</div>
+        </div>
+        <div class="terminal-body">
+<span class="token-comment">// High-Security AEAD Envelope Encryption</span>
+<span class="token-purple">fun</span> <span class="token-cyan">encryptPayload</span>(
+  plaintext: <span class="token-yellow">String</span>,
+  keyBytes: <span class="token-yellow">ByteArray</span>
+): <span class="token-yellow">EncryptedEnvelope</span> {
+  <span class="token-purple">val</span> iv = <span class="token-yellow">ByteArray</span>(12)
+  secureRandom.nextBytes(iv)
+
+  <span class="token-purple">val</span> cipher = Cipher.getInstance(<span class="token-green">"AES/GCM/NoPadding"</span>)
+  <span class="token-purple">val</span> spec = GCMParameterSpec(128, iv)
+  cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(keyBytes, <span class="token-green">"AES"</span>), spec)
+
+  <span class="token-purple">val</span> ciphertext = cipher.doFinal(plaintext.toByteArray())
+  <span class="token-purple">val</span> signature = computeHmacSha256(ciphertext, keyBytes)
+
+  <span class="token-purple">return</span> EncryptedEnvelope(
+    ciphertextBase64 = encode(ciphertext),
+    ivBase64 = encode(iv),
+    macSignatureHex = signature
+  )
+}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download & Sideloading Guide -->
+  <section id="download" class="download-section container">
+    <div class="download-box">
+      <div class="section-tag">OFFICIAL RELEASE</div>
+      <h2>Get Silouder for Android</h2>
+      <p style="color: var(--text-secondary); max-width: 540px; margin: 0 auto;">
+        Install the latest signed debug APK directly from GitHub Releases. No Google account required.
+      </p>
+
+      <div class="download-meta-list">
+        <div class="dl-item">
+          <span>Release Version</span>
+          <span>v1.0.0</span>
+        </div>
+        <div class="dl-item">
+          <span>Target Architecture</span>
+          <span>ARM64 / Universal</span>
+        </div>
+        <div class="dl-item">
+          <span>Min Android Version</span>
+          <span>Android 7.0+ (API 24)</span>
+        </div>
+        <div class="dl-item">
+          <span>APK Package Size</span>
+          <span>~17.8 MB</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+        <a href="#" class="btn-primary" data-download-apk>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Direct Download: app-debug.apk
+        </a>
+
+        <a href="#" class="btn-secondary" data-release-link target="_blank" rel="noopener">
+          View All GitHub Releases
+        </a>
+      </div>
+
+      <!-- 3-step sideload guide -->
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h4>Download APK</h4>
+          <p>Download <code>app-debug.apk</code> directly to your Android device or transfer via USB.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h4>Allow Install</h4>
+          <p>If prompted by Android, enable <em>"Install unknown apps"</em> for your browser or file manager.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h4>Launch Offline</h4>
+          <p>Open Silouder. Your cryptographic keys and node ID are generated entirely offline upon launch.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <div class="footer-copy">
+        <div style="font-weight: 700; color: #F1F5F9;">SILOUDER COMMUNICATOR</div>
+        <div>Copyright &copy; 2026 Somser Ali. Free & Open Source under GNU GPL-3.0.</div>
+        <div style="font-size: 0.8rem; color: #64748B;">Protocol inspiration: Meshtastic (GPL-3.0), Briar (AGPL-3.0), Tor Project (BSD-3).</div>
+      </div>
+
+      <div class="footer-links">
+        <a href="#" data-repo-link target="_blank" rel="noopener">GitHub Repo</a>
+        <a href="#" data-release-link target="_blank" rel="noopener">Releases</a>
+        <a href="#transports">Transports</a>
+        <a href="#security">Security</a>
+        <a href="#download">Download APK</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
