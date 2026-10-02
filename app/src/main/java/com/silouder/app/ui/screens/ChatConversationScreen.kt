@@ -1,8 +1,16 @@
 package com.silouder.app.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.media.MediaPlayer
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
@@ -30,20 +40,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.silouder.app.media.ActiveCallSession
+import com.silouder.app.media.CallState
+import com.silouder.app.media.CallType
+import com.silouder.app.media.FileManager
 import com.silouder.app.model.ChannelType
 import com.silouder.app.model.MessageStatus
 import com.silouder.app.model.TransportRouteHint
 import com.silouder.app.model.UnifiedMessage
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.AppScreen
 import com.silouder.app.ui.theme.*
 import kotlinx.coroutines.launch
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatConversationScreen(
-    viewModel: AegisViewModel,
+    viewModel: SilouderViewModel,
     modifier: Modifier = Modifier
 ) {
     BackHandler {
@@ -63,6 +79,11 @@ fun ChatConversationScreen(
         allMessages.filter { it.conversationId == convId }
     }
 
+    val isRecordingVoice by viewModel.isRecordingVoice.collectAsStateWithLifecycle()
+    val voiceDuration by viewModel.voiceRecordingDuration.collectAsStateWithLifecycle()
+    val callSession by viewModel.callSession.collectAsStateWithLifecycle()
+    val isPttActive by viewModel.isPttActive.collectAsStateWithLifecycle()
+
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -71,8 +92,63 @@ fun ChatConversationScreen(
     var showUrgentAlertModal by remember { mutableStateOf(false) }
     var urgentAlertText by remember { mutableStateOf("") }
     var showBurnConfirmModal by remember { mutableStateOf(false) }
+    var showAttachmentPicker by remember { mutableStateOf(false) }
 
     val isEmergency = currentChannel?.channelType == ChannelType.EMERGENCY_GROUP || (currentChannel?.isEmergencyGroup == true)
+
+    // Activity Launchers for Attachments and Permissions
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val copiedFile = viewModel.fileManager.copyUriToInternalStorage(uri, "photo_${System.currentTimeMillis()}.jpg")
+            if (copiedFile != null) {
+                viewModel.sendMessageWithAttachment("IMAGE", copiedFile)
+                Toast.makeText(context, "Sending encrypted photo...", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    val documentPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val copiedFile = viewModel.fileManager.copyUriToInternalStorage(uri, "doc_${System.currentTimeMillis()}")
+            if (copiedFile != null) {
+                viewModel.sendMessageWithAttachment("DOCUMENT", copiedFile)
+                Toast.makeText(context, "Sending encrypted file...", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    val audioPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            val started = viewModel.startVoiceRecording()
+            if (!started) {
+                Toast.makeText(context, "Could not start voice recording", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(context, "Microphone permission required for voice notes", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val callAudioPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted && currentChannel != null) {
+            val peerIp = currentChannel.peerNodeId?.removePrefix("!") ?: "192.168.1.120"
+            viewModel.initiateCall(
+                peerId = currentChannel.peerNodeId ?: "peer",
+                peerName = currentChannel.name,
+                peerIp = peerIp,
+                isVideo = false
+            )
+        } else {
+            Toast.makeText(context, "Microphone permission required for P2P calling", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     LaunchedEffect(conversationMessages.size) {
         if (conversationMessages.isNotEmpty()) {
@@ -150,6 +226,47 @@ fun ChatConversationScreen(
                             Icon(Icons.Filled.LocalFireDepartment, contentDescription = "Burn Group", tint = TextMuted)
                         }
                     } else {
+                        // P2P Audio Call Button
+                        IconButton(
+                            onClick = {
+                                if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                                    val peerIp = currentChannel?.peerNodeId?.removePrefix("!") ?: "192.168.1.120"
+                                    viewModel.initiateCall(
+                                        peerId = currentChannel?.peerNodeId ?: "peer",
+                                        peerName = currentChannel?.name ?: "Peer",
+                                        peerIp = peerIp,
+                                        isVideo = false
+                                    )
+                                } else {
+                                    callAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                }
+                            },
+                            modifier = Modifier.testTag("audio_call_button")
+                        ) {
+                            Icon(Icons.Filled.Call, contentDescription = "P2P Audio Call", tint = TacticalEmerald)
+                        }
+
+                        // P2P Video Call Button
+                        IconButton(
+                            onClick = {
+                                if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                                    val peerIp = currentChannel?.peerNodeId?.removePrefix("!") ?: "192.168.1.120"
+                                    viewModel.initiateCall(
+                                        peerId = currentChannel?.peerNodeId ?: "peer",
+                                        peerName = currentChannel?.name ?: "Peer",
+                                        peerIp = peerIp,
+                                        isVideo = true
+                                    )
+                                } else {
+                                    callAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                }
+                            },
+                            modifier = Modifier.testTag("video_call_button")
+                        ) {
+                            Icon(Icons.Filled.Videocam, contentDescription = "P2P Video Call", tint = CyberCyan)
+                        }
+
+                        // Simulate RX Button
                         IconButton(
                             onClick = {
                                 if (currentChannel?.channelType == ChannelType.DIRECT_NETWORK_PEER) {
@@ -387,60 +504,277 @@ fun ChatConversationScreen(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = draft,
-                            onValueChange = { viewModel.setMessageDraft(it) },
-                            placeholder = {
-                                Text(
-                                    if (isEmergency) "Write to emergency group..." else "Write encrypted message...",
-                                    fontSize = 13.sp
-                                )
-                            },
+                    if (isRecordingVoice) {
+                        // Voice recording active bar
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
-                                .testTag("message_input_field"),
-                            maxLines = 3,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = DarkSurfaceElevated,
-                                unfocusedContainerColor = DarkSurfaceElevated,
-                                focusedBorderColor = if (isEmergency) SignalRed else CyberCyan,
-                                unfocusedBorderColor = DarkSurfaceHighlight
-                            ),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-
-                        IconButton(
-                            onClick = {
-                                viewModel.sendMessage()
-                                coroutineScope.launch {
-                                    if (conversationMessages.isNotEmpty()) {
-                                        listState.animateScrollToItem(conversationMessages.size - 1)
-                                    }
-                                }
-                            },
-                            enabled = draft.isNotBlank(),
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(if (draft.isNotBlank()) (if (isEmergency) SignalRed else CyberCyan) else DarkSurfaceHighlight)
-                                .testTag("send_message_button")
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.Send,
-                                contentDescription = "Send",
-                                tint = if (draft.isNotBlank()) (if (isEmergency) Color.White else Color(0xFF050B14)) else TextMuted,
-                                modifier = Modifier.size(20.dp)
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(SignalRed)
                             )
+                            Text(
+                                text = String.format(java.util.Locale.US, "%02d:%02d", voiceDuration / 60, voiceDuration % 60),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                color = SignalRed
+                            )
+                            Text(
+                                text = "Recording Voice Note...",
+                                fontSize = 12.sp,
+                                color = TextSecondary,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            // Cancel voice note button
+                            IconButton(
+                                onClick = { viewModel.cancelVoiceRecording() },
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(CircleShape)
+                                    .background(DarkSurfaceElevated)
+                            ) {
+                                Icon(Icons.Filled.Delete, contentDescription = "Cancel Recording", tint = SignalRed, modifier = Modifier.size(18.dp))
+                            }
+
+                            // Send voice note button
+                            IconButton(
+                                onClick = {
+                                    viewModel.stopVoiceRecordingAndSend()
+                                    coroutineScope.launch {
+                                        if (conversationMessages.isNotEmpty()) {
+                                            listState.animateScrollToItem(conversationMessages.size - 1)
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(CircleShape)
+                                    .background(TacticalEmerald)
+                            ) {
+                                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send Voice Note", tint = Color.White, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    } else {
+                        // Standard input row with Attach + Text Input + Mic / Send
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            // Attachment button
+                            IconButton(
+                                onClick = { showAttachmentPicker = true },
+                                modifier = Modifier.size(38.dp)
+                            ) {
+                                Icon(Icons.Filled.AttachFile, contentDescription = "Attach File", tint = CyberCyan, modifier = Modifier.size(22.dp))
+                            }
+
+                            OutlinedTextField(
+                                value = draft,
+                                onValueChange = { viewModel.setMessageDraft(it) },
+                                placeholder = {
+                                    Text(
+                                        if (isEmergency) "Write to emergency group..." else "Write encrypted message...",
+                                        fontSize = 13.sp
+                                    )
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag("message_input_field"),
+                                maxLines = 3,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedContainerColor = DarkSurfaceElevated,
+                                    unfocusedContainerColor = DarkSurfaceElevated,
+                                    focusedBorderColor = if (isEmergency) SignalRed else CyberCyan,
+                                    unfocusedBorderColor = DarkSurfaceHighlight
+                                ),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+
+                            if (draft.isNotBlank()) {
+                                IconButton(
+                                    onClick = {
+                                        viewModel.sendMessage()
+                                        coroutineScope.launch {
+                                            if (conversationMessages.isNotEmpty()) {
+                                                listState.animateScrollToItem(conversationMessages.size - 1)
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(CircleShape)
+                                        .background(if (isEmergency) SignalRed else CyberCyan)
+                                        .testTag("send_message_button")
+                                ) {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.Send,
+                                        contentDescription = "Send",
+                                        tint = if (isEmergency) Color.White else Color(0xFF050B14),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            } else {
+                                // Mic Button for Voice Note
+                                IconButton(
+                                    onClick = {
+                                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                                            val started = viewModel.startVoiceRecording()
+                                            if (!started) {
+                                                Toast.makeText(context, "Could not start voice recorder", Toast.LENGTH_SHORT).show()
+                                            }
+                                        } else {
+                                            audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(CircleShape)
+                                        .background(DarkSurfaceElevated)
+                                        .testTag("voice_record_button")
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Mic,
+                                        contentDescription = "Record Voice Note",
+                                        tint = CyberCyan,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    // Attachment Picker Modal
+    if (showAttachmentPicker) {
+        ModalBottomSheet(
+            onDismissRequest = { showAttachmentPicker = false },
+            containerColor = DarkSurfaceElevated
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Share Encrypted Media",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    // Send Photo
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clickable {
+                                showAttachmentPicker = false
+                                photoPickerLauncher.launch("image/*")
+                            }
+                            .padding(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(CircleShape)
+                                .background(CyberCyanContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Filled.Image, contentDescription = "Photo", tint = CyberCyan, modifier = Modifier.size(26.dp))
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("Photo", fontSize = 12.sp, color = TextPrimary)
+                    }
+
+                    // Send Document
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clickable {
+                                showAttachmentPicker = false
+                                documentPickerLauncher.launch("*/*")
+                            }
+                            .padding(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(CircleShape)
+                                .background(TacticalEmerald.copy(alpha = 0.2f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Filled.InsertDriveFile, contentDescription = "File", tint = TacticalEmerald, modifier = Modifier.size(26.dp))
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("File / Doc", fontSize = 12.sp, color = TextPrimary)
+                    }
+
+                    // Push-to-Talk (PTT Walkie Talkie)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clickable {
+                                showAttachmentPicker = false
+                                val targetIp = currentChannel?.peerNodeId?.removePrefix("!") ?: "192.168.1.120"
+                                if (isPttActive) {
+                                    viewModel.stopPtt()
+                                    Toast.makeText(context, "Walkie-Talkie burst ended", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    viewModel.startPtt(targetIp)
+                                    Toast.makeText(context, "Walkie-Talkie burst active!", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            .padding(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(CircleShape)
+                                .background(if (isPttActive) SignalRedContainer else AmberAlert.copy(alpha = 0.2f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Filled.Radio,
+                                contentDescription = "PTT Walkie-Talkie",
+                                tint = if (isPttActive) SignalRed else AmberAlert,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(if (isPttActive) "Stop PTT" else "PTT Walkie", fontSize = 12.sp, color = TextPrimary)
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+
+    // In-Call Overlay / Dialog
+    if (callSession != null) {
+        InCallOverlay(
+            session = callSession!!,
+            onAnswer = { viewModel.answerCall() },
+            onDecline = { viewModel.declineCall() },
+            onEndCall = { viewModel.endCall() },
+            onToggleMute = { viewModel.toggleMute() },
+            onToggleSpeaker = { viewModel.toggleSpeaker() }
+        )
     }
 
     // Modal: Urgent Group Alert Broadcast
@@ -624,12 +958,32 @@ fun MessageBubble(
                     }
                 }
 
-                Text(
-                    text = message.plaintext,
-                    fontSize = 13.sp,
-                    fontWeight = if (isUrgent) FontWeight.SemiBold else FontWeight.Normal,
-                    color = TextPrimary
-                )
+                // Render Attachment if present
+                when (message.attachmentType) {
+                    "IMAGE" -> {
+                        PhotoAttachmentView(filePath = message.attachmentPath)
+                    }
+                    "AUDIO_VOICE" -> {
+                        VoiceNotePlayer(filePath = message.attachmentPath, durationMs = message.durationMs)
+                    }
+                    "DOCUMENT" -> {
+                        DocumentAttachmentView(
+                            fileName = message.attachmentName,
+                            fileSize = message.attachmentSize,
+                            filePath = message.attachmentPath
+                        )
+                    }
+                }
+
+                // Plaintext content (if not voice note)
+                if (message.attachmentType != "AUDIO_VOICE") {
+                    Text(
+                        text = message.plaintext,
+                        fontSize = 13.sp,
+                        fontWeight = if (isUrgent) FontWeight.SemiBold else FontWeight.Normal,
+                        color = TextPrimary
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(6.dp))
 
@@ -699,17 +1053,363 @@ fun MessageBubble(
                                 .clickable(onClick = onViewCiphertext)
                         )
 
-                        // Status Icon
-                        when (message.status) {
-                            MessageStatus.QUEUED -> Icon(Icons.Filled.HourglassEmpty, contentDescription = "Queued", tint = AmberAlert, modifier = Modifier.size(12.dp))
-                            MessageStatus.TRANSMITTING -> Icon(Icons.Filled.Sync, contentDescription = "Sending", tint = CyberCyan, modifier = Modifier.size(12.dp))
-                            MessageStatus.DELIVERED_BLUETOOTH, MessageStatus.DELIVERED_NETWORK, MessageStatus.DELIVERED_MESH, MessageStatus.DELIVERED_TOR -> Icon(Icons.Filled.Check, contentDescription = "Delivered", tint = TacticalEmerald, modifier = Modifier.size(12.dp))
-                            MessageStatus.ACK_RECEIVED -> Icon(Icons.Filled.DoneAll, contentDescription = "ACK", tint = CyberCyan, modifier = Modifier.size(12.dp))
-                            else -> {}
+                        // Status Delivery Icon (Signal / Telegram style receipts)
+                        if (isMe) {
+                            when (message.status) {
+                                MessageStatus.QUEUED -> {
+                                    Icon(Icons.Filled.Schedule, contentDescription = "Queued", tint = AmberAlert, modifier = Modifier.size(12.dp))
+                                }
+                                MessageStatus.TRANSMITTING -> {
+                                    Icon(Icons.Filled.Sync, contentDescription = "Sending", tint = CyberCyan, modifier = Modifier.size(12.dp))
+                                }
+                                MessageStatus.DELIVERED_BLUETOOTH, MessageStatus.DELIVERED_NETWORK, MessageStatus.DELIVERED_MESH, MessageStatus.DELIVERED_TOR -> {
+                                    Icon(Icons.Filled.Check, contentDescription = "Sent", tint = TacticalEmerald, modifier = Modifier.size(13.dp))
+                                }
+                                MessageStatus.ACK_RECEIVED -> {
+                                    Icon(Icons.Filled.DoneAll, contentDescription = "Delivered", tint = CyberCyan, modifier = Modifier.size(14.dp))
+                                }
+                                else -> {}
+                            }
                         }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun VoiceNotePlayer(filePath: String?, durationMs: Long) {
+    val context = LocalContext.current
+    var isPlaying by remember { mutableStateOf(false) }
+    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+
+    DisposableEffect(filePath) {
+        onDispose {
+            mediaPlayer?.release()
+            mediaPlayer = null
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(DarkBackground.copy(alpha = 0.5f))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        IconButton(
+            onClick = {
+                if (filePath.isNullOrBlank()) {
+                    Toast.makeText(context, "Voice note audio data not loaded", Toast.LENGTH_SHORT).show()
+                    return@IconButton
+                }
+                val f = File(filePath)
+                if (!f.exists()) {
+                    Toast.makeText(context, "Voice note file not found", Toast.LENGTH_SHORT).show()
+                    return@IconButton
+                }
+
+                if (isPlaying) {
+                    mediaPlayer?.pause()
+                    isPlaying = false
+                } else {
+                    if (mediaPlayer == null) {
+                        try {
+                            mediaPlayer = MediaPlayer().apply {
+                                setDataSource(filePath)
+                                prepare()
+                                setOnCompletionListener {
+                                    isPlaying = false
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            return@IconButton
+                        }
+                    }
+                    mediaPlayer?.start()
+                    isPlaying = true
+                }
+            },
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(TacticalEmerald)
+        ) {
+            Icon(
+                imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                contentDescription = if (isPlaying) "Pause" else "Play",
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                val heights = listOf(4, 8, 12, 16, 10, 14, 8, 6, 12, 14, 16, 10, 6, 8, 14, 12, 6, 10, 8, 4)
+                for (h in heights) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(h.dp)
+                            .clip(RoundedCornerShape(1.dp))
+                            .background(if (isPlaying) TacticalEmerald else TextSecondary)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            val secs = if (durationMs > 0) durationMs / 1000 else 0
+            Text(
+                text = String.format(java.util.Locale.US, "%02d:%02d • Encrypted Voice Note", secs / 60, secs % 60),
+                fontSize = 9.sp,
+                color = TextMuted
+            )
+        }
+    }
+}
+
+@Composable
+fun PhotoAttachmentView(filePath: String?) {
+    val bitmap = remember(filePath) {
+        if (!filePath.isNullOrBlank()) {
+            try {
+                val f = File(filePath)
+                if (f.exists()) BitmapFactory.decodeFile(f.absolutePath)?.asImageBitmap() else null
+            } catch (e: Exception) {
+                null
+            }
+        } else null
+    }
+
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap,
+            contentDescription = "Encrypted Photo",
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 220.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+    } else {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(DarkBackground.copy(alpha = 0.5f))
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(Icons.Filled.Image, contentDescription = null, tint = CyberCyan, modifier = Modifier.size(24.dp))
+            Text("📷 Photo Attachment", fontSize = 12.sp, color = TextPrimary)
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+    }
+}
+
+@Composable
+fun DocumentAttachmentView(fileName: String?, fileSize: Long, filePath: String?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(DarkBackground.copy(alpha = 0.5f))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(CyberCyanContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Filled.InsertDriveFile, contentDescription = null, tint = CyberCyan, modifier = Modifier.size(20.dp))
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = fileName ?: "Encrypted File",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "${FileManager.formatFileSize(fileSize)} • E2EE",
+                fontSize = 10.sp,
+                color = TextMuted
+            )
+        }
+        Icon(Icons.Filled.FileDownload, contentDescription = "Download/Open", tint = TacticalEmerald, modifier = Modifier.size(20.dp))
+    }
+    Spacer(modifier = Modifier.height(4.dp))
+}
+
+@Composable
+fun InCallOverlay(
+    session: ActiveCallSession,
+    onAnswer: () -> Unit,
+    onDecline: () -> Unit,
+    onEndCall: () -> Unit,
+    onToggleMute: () -> Unit,
+    onToggleSpeaker: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { /* Modal active */ },
+        containerColor = DarkSurface,
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = if (session.callType == CallType.VIDEO) Icons.Filled.Videocam else Icons.Filled.Call,
+                    contentDescription = null,
+                    tint = if (session.callState == CallState.CONNECTED) TacticalEmerald else AmberAlert
+                )
+                Text(
+                    text = when (session.callState) {
+                        CallState.INCOMING_RINGING -> "Incoming ${session.callType.name} Call"
+                        CallState.OUTGOING_RINGING -> "Calling..."
+                        CallState.CONNECTED -> "P2P ${session.callType.name} Call Active"
+                        else -> "Call"
+                    },
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                        .background(CyberCyanContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (session.callType == CallType.VIDEO) Icons.Filled.Videocam else Icons.Filled.Person,
+                        contentDescription = null,
+                        tint = CyberCyan,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+
+                Text(
+                    text = session.peerName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                Text(
+                    text = "Direct Peer IP: ${session.peerIp}",
+                    fontSize = 11.sp,
+                    color = TextMuted
+                )
+
+                if (session.callState == CallState.CONNECTED) {
+                    Text(
+                        text = String.format(java.util.Locale.US, "%02d:%02d", session.durationSeconds / 60, session.durationSeconds % 60),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace,
+                        color = TacticalEmerald
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Mute button
+                        IconButton(
+                            onClick = onToggleMute,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(if (session.isMuted) SignalRedContainer else DarkSurfaceElevated)
+                        ) {
+                            Icon(
+                                imageVector = if (session.isMuted) Icons.Filled.MicOff else Icons.Filled.Mic,
+                                contentDescription = "Mute",
+                                tint = if (session.isMuted) SignalRed else TextPrimary
+                            )
+                        }
+
+                        // Speaker button
+                        IconButton(
+                            onClick = onToggleSpeaker,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(if (session.isSpeakerOn) CyberCyanContainer else DarkSurfaceElevated)
+                        ) {
+                            Icon(
+                                imageVector = if (session.isSpeakerOn) Icons.Filled.VolumeUp else Icons.Filled.VolumeDown,
+                                contentDescription = "Speaker",
+                                tint = if (session.isSpeakerOn) CyberCyan else TextPrimary
+                            )
+                        }
+                    }
+                } else if (session.callState == CallState.OUTGOING_RINGING) {
+                    Text(
+                        text = "Establishing AES-256 UDP stream...",
+                        fontSize = 12.sp,
+                        color = AmberAlert
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            if (session.callState == CallState.INCOMING_RINGING) {
+                Button(
+                    onClick = onAnswer,
+                    colors = ButtonDefaults.buttonColors(containerColor = TacticalEmerald)
+                ) {
+                    Icon(Icons.Filled.Call, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Answer")
+                }
+            } else {
+                Button(
+                    onClick = onEndCall,
+                    colors = ButtonDefaults.buttonColors(containerColor = SignalRed)
+                ) {
+                    Icon(Icons.Filled.CallEnd, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("End Call")
+                }
+            }
+        },
+        dismissButton = {
+            if (session.callState == CallState.INCOMING_RINGING) {
+                TextButton(
+                    onClick = onDecline,
+                    colors = ButtonDefaults.textButtonColors(contentColor = SignalRed)
+                ) {
+                    Text("Decline")
+                }
+            }
+        }
+    )
 }

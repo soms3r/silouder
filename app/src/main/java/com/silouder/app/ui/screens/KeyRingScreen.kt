@@ -23,12 +23,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.theme.*
 
 @Composable
 fun KeyRingScreen(
-    viewModel: AegisViewModel,
+    viewModel: SilouderViewModel,
     modifier: Modifier = Modifier
 ) {
     val identity by viewModel.myIdentity.collectAsStateWithLifecycle()

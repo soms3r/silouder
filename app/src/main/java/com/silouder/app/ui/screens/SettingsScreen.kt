@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.silouder.app.model.NatureAvatars
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.AppDisplayMode
 import com.silouder.app.ui.AppScreen
 import com.silouder.app.ui.theme.*
@@ -36,7 +36,7 @@ import com.silouder.app.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: AegisViewModel,
+    viewModel: SilouderViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current

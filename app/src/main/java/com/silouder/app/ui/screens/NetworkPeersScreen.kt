@@ -24,14 +24,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.silouder.app.transport.network.NetworkPeer
 import com.silouder.app.transport.network.NetworkServerStatus
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.AppScreen
 import com.silouder.app.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetworkPeersScreen(
-    viewModel: AegisViewModel,
+    viewModel: SilouderViewModel,
     modifier: Modifier = Modifier
 ) {
     val peers by viewModel.networkPeerTransport.networkPeers.collectAsStateWithLifecycle()

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar" />
+    <style name="Theme.Silouder" parent="android:Theme.DeviceDefault.NoActionBar" />
+    <!-- Alias for backward compatibility -->
+    <style name="Theme.MyApplication" parent="Theme.Silouder" />
 </resources>

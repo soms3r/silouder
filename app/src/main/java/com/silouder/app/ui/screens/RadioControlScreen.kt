@@ -20,12 +20,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.silouder.app.model.HardwareModel
 import com.silouder.app.transport.meshtastic.BleConnectionState
 import com.silouder.app.transport.meshtastic.RadioModemConfig
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.theme.*
 
 @Composable
 fun RadioControlScreen(
-    viewModel: AegisViewModel,
+    viewModel: SilouderViewModel,
     modifier: Modifier = Modifier
 ) {
     val bleState by viewModel.bleTransceiver.connectionState.collectAsStateWithLifecycle()

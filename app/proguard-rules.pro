@@ -14,8 +14,21 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Room database rules
+-keepclassmembers class * extends androidx.room.RoomDatabase {
+    public <init>();
+}
+-keep class * extends androidx.room.RoomDatabase
+-dontwarn androidx.room.paging.**
+
+# OkHttp & Okio rules
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+
+# Silouder data models and entities
+-keep class com.silouder.app.data.** { *; }
+-keep class com.silouder.app.model.** { *; }

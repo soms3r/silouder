@@ -82,6 +82,10 @@ class MeshRepository(private val database: AppDatabase) {
         database.channelDao().markAsRead(channelId)
     }
 
+    suspend fun incrementUnread(channelId: String) {
+        database.channelDao().incrementUnread(channelId)
+    }
+
     suspend fun logPacket(packet: PacketTrace) {
         database.packetLogDao().insertPacket(PacketLogEntity.fromDomain(packet))
     }

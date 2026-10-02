@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.silouder.app.model.ChannelType
 import com.silouder.app.model.MeshChannel
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.theme.*
 
 enum class ChatCategoryTab {
@@ -46,7 +46,7 @@ enum class ChatCategoryTab {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListScreen(
-    viewModel: AegisViewModel,
+    viewModel: SilouderViewModel,
     modifier: Modifier = Modifier
 ) {
     val channels by viewModel.allChannels.collectAsStateWithLifecycle()

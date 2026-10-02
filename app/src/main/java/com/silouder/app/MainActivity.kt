@@ -29,21 +29,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.silouder.app.model.NatureAvatars
 import com.silouder.app.transport.meshtastic.BleConnectionState
 import com.silouder.app.transport.tor.TorStatus
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.AppScreen
 import com.silouder.app.ui.screens.*
 import com.silouder.app.ui.theme.*
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: AegisViewModel by viewModels()
+    private val viewModel: SilouderViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyApplicationTheme {
+            SilouderTheme {
                 val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
                 val btPeers by viewModel.bluetoothPeerManager.discoveredPeers.collectAsStateWithLifecycle()
                 val netPeers by viewModel.networkPeerTransport.networkPeers.collectAsStateWithLifecycle()

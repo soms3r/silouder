@@ -192,15 +192,39 @@ class TransportRouter(
 
     private suspend fun transmitViaNetwork(message: UnifiedMessage): Boolean {
         logRoutingEvent("Dispatching App-to-App Online Network message...")
-        val targetPeer = networkPeerTransport.networkPeers.value.firstOrNull { it.isOnline }
-        val targetIp = targetPeer?.ipAddress ?: "192.168.1.120"
+        val targetPeer = networkPeerTransport.networkPeers.value.find { it.peerId == message.recipientId || it.ipAddress == message.recipientId }
+            ?: networkPeerTransport.networkPeers.value.firstOrNull { it.isOnline }
+        val targetIp = targetPeer?.ipAddress ?: "127.0.0.1"
         val port = targetPeer?.port ?: 8888
+
+        val attachmentBase64 = if (!message.attachmentPath.isNullOrBlank()) {
+            try {
+                val f = java.io.File(message.attachmentPath)
+                if (f.exists() && f.length() <= 10 * 1024 * 1024) {
+                    val bytes = f.readBytes()
+                    android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                } else null
+            } catch (e: Exception) {
+                null
+            }
+        } else null
 
         val success = networkPeerTransport.transmitAppToAppOnline(
             targetIp = targetIp,
             port = port,
             payloadCiphertext = message.payloadCiphertext,
-            messageId = message.messageId
+            messageId = message.messageId,
+            senderId = message.senderId,
+            recipientId = message.recipientId,
+            conversationId = message.conversationId,
+            plaintext = message.plaintext,
+            ivBase64 = message.ivBase64,
+            macSignature = message.macSignature,
+            attachmentType = message.attachmentType,
+            attachmentName = message.attachmentName,
+            attachmentSize = message.attachmentSize,
+            durationMs = message.durationMs,
+            attachmentData = attachmentBase64
         )
 
         if (success) {

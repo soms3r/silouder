@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.silouder.app.model.MeshNode
 import com.silouder.app.model.NodeRole
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.AppScreen
 import com.silouder.app.ui.theme.*
 import kotlin.math.cos
@@ -35,7 +35,7 @@ import kotlin.math.sin
 
 @Composable
 fun MeshTopologyScreen(
-    viewModel: AegisViewModel,
+    viewModel: SilouderViewModel,
     modifier: Modifier = Modifier
 ) {
     val nodes by viewModel.allNodes.collectAsStateWithLifecycle()

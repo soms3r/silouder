@@ -36,7 +36,12 @@ data class MessageEntity(
     val isBroadcast: Boolean,
     val fragmentCount: Int,
     val deliveryAttempts: Int,
-    val isUrgentAlert: Boolean = false
+    val isUrgentAlert: Boolean = false,
+    val attachmentType: String? = null,
+    val attachmentPath: String? = null,
+    val attachmentName: String? = null,
+    val attachmentSize: Long = 0L,
+    val durationMs: Long = 0L
 ) {
     fun toDomain(): UnifiedMessage = UnifiedMessage(
         messageId = messageId,
@@ -61,7 +66,12 @@ data class MessageEntity(
         isBroadcast = isBroadcast,
         fragmentCount = fragmentCount,
         deliveryAttempts = deliveryAttempts,
-        isUrgentAlert = isUrgentAlert
+        isUrgentAlert = isUrgentAlert,
+        attachmentType = attachmentType,
+        attachmentPath = attachmentPath,
+        attachmentName = attachmentName,
+        attachmentSize = attachmentSize,
+        durationMs = durationMs
     )
 
     companion object {
@@ -88,7 +98,12 @@ data class MessageEntity(
             isBroadcast = msg.isBroadcast,
             fragmentCount = msg.fragmentCount,
             deliveryAttempts = msg.deliveryAttempts,
-            isUrgentAlert = msg.isUrgentAlert
+            isUrgentAlert = msg.isUrgentAlert,
+            attachmentType = msg.attachmentType,
+            attachmentPath = msg.attachmentPath,
+            attachmentName = msg.attachmentName,
+            attachmentSize = msg.attachmentSize,
+            durationMs = msg.durationMs
         )
     }
 }

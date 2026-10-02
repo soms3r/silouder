@@ -6,7 +6,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val AegisDarkColorScheme = darkColorScheme(
+private val SilouderDarkColorScheme = darkColorScheme(
     primary = CyberCyan,
     onPrimary = Color(0xFF00363A),
     primaryContainer = CyberCyanContainer,
@@ -40,7 +40,7 @@ private val AegisDarkColorScheme = darkColorScheme(
     onErrorContainer = Color(0xFFFECACA)
 )
 
-private val AegisLightColorScheme = lightColorScheme(
+private val SilouderLightColorScheme = lightColorScheme(
     primary = Color(0xFF0284C7),
     onPrimary = Color.White,
     primaryContainer = Color(0xFFE0F2FE),
@@ -70,14 +70,22 @@ private val AegisLightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun MyApplicationTheme(
-    darkTheme: Boolean = true, // Default to dark stealth theme for mesh tactical communicator
+fun SilouderTheme(
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) AegisDarkColorScheme else AegisLightColorScheme
+    val colorScheme = if (darkTheme) SilouderDarkColorScheme else SilouderLightColorScheme
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
         content = content
     )
+}
+
+@Composable
+fun MyApplicationTheme(
+    darkTheme: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    SilouderTheme(darkTheme = darkTheme, content = content)
 }

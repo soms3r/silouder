@@ -57,5 +57,10 @@ data class UnifiedMessage(
     val isBroadcast: Boolean = false,
     val fragmentCount: Int = 1,          // Chunk count
     val deliveryAttempts: Int = 0,
-    val isUrgentAlert: Boolean = false   // High-priority emergency broadcast banner
+    val isUrgentAlert: Boolean = false,  // High-priority emergency broadcast banner
+    val attachmentType: String? = null,  // IMAGE, FILE, VOICE_NOTE, PTT_AUDIO, CALL_EVENT
+    val attachmentPath: String? = null,  // Local file or cache path
+    val attachmentName: String? = null,  // e.g. "photo.jpg", "field_report.pdf"
+    val attachmentSize: Long = 0L,       // Size in bytes
+    val durationMs: Long = 0L            // Audio or call duration in ms
 )

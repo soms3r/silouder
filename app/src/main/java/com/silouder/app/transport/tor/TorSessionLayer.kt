@@ -38,7 +38,7 @@ class TorSessionLayer(
     private val _bootstrapProgress = MutableStateFlow(100)
     val bootstrapProgress: StateFlow<Int> = _bootstrapProgress.asStateFlow()
 
-    private val _onionAddress = MutableStateFlow("aegis7vqx4mk89pz.onion")
+    private val _onionAddress = MutableStateFlow("silouder7vqx4mk89pz.onion")
     val onionAddress: StateFlow<String> = _onionAddress.asStateFlow()
 
     private val _isInternetReachable = MutableStateFlow(true)

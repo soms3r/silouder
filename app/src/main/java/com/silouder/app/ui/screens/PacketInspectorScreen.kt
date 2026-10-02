@@ -24,13 +24,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.silouder.app.model.PacketDirection
 import com.silouder.app.model.PacketTrace
 import com.silouder.app.model.PacketType
-import com.silouder.app.ui.AegisViewModel
+import com.silouder.app.ui.SilouderViewModel
 import com.silouder.app.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
 fun PacketInspectorScreen(
-    viewModel: AegisViewModel,
+    viewModel: SilouderViewModel,
     modifier: Modifier = Modifier
 ) {
     val packets by viewModel.recentPackets.collectAsStateWithLifecycle()

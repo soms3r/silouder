@@ -119,6 +119,9 @@ interface ChannelDao {
     @Query("UPDATE channels SET memberCount = memberCount + 1 WHERE channelId = :id")
     suspend fun incrementMemberCount(id: String)
 
+    @Query("UPDATE channels SET unreadCount = unreadCount + 1 WHERE channelId = :id")
+    suspend fun incrementUnread(id: String)
+
     @Query("DELETE FROM channels WHERE channelId = :id")
     suspend fun deleteChannel(id: String)
 }

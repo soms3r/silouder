@@ -55,27 +55,10 @@ class BleMeshTransceiver(
         val FROMRADIO_CHAR_UUID: UUID = UUID.fromString("2c55e69e-4993-11ed-b878-0242ac120002")
     }
 
-    private val _connectionState = MutableStateFlow(BleConnectionState.CONNECTED_STREAMING)
+    private val _connectionState = MutableStateFlow(BleConnectionState.DISCONNECTED)
     val connectionState: StateFlow<BleConnectionState> = _connectionState.asStateFlow()
 
-    private val _connectedRadioNode = MutableStateFlow<MeshNode?>(
-        MeshNode(
-            nodeId = "!7a9f1b2c",
-            longName = "Aegis Master Heltec V3",
-            shortName = "AGIS",
-            role = NodeRole.ROUTER,
-            hardwareModel = HardwareModel.HELTEC_V3,
-            snr = 9.8f,
-            rssi = -64,
-            batteryLevel = 94,
-            voltage = 4.18f,
-            channelUtilization = 8.5f,
-            isBleConnectedRadio = true,
-            latitude = 37.7749,
-            longitude = -122.4194,
-            altitude = 42
-        )
-    )
+    private val _connectedRadioNode = MutableStateFlow<MeshNode?>(null)
     val connectedRadioNode: StateFlow<MeshNode?> = _connectedRadioNode.asStateFlow()
 
     private val _modemConfig = MutableStateFlow(RadioModemConfig())
@@ -84,17 +67,35 @@ class BleMeshTransceiver(
     private val _incomingFromRadioPackets = MutableSharedFlow<ByteArray>(extraBufferCapacity = 64)
     val incomingFromRadioPackets: SharedFlow<ByteArray> = _incomingFromRadioPackets.asSharedFlow()
 
-    private val _isSimulatedHardware = MutableStateFlow(true)
+    private val _isSimulatedHardware = MutableStateFlow(false)
     val isSimulatedHardware: StateFlow<Boolean> = _isSimulatedHardware.asStateFlow()
 
     private var heartbeatJob: Job? = null
 
-    init {
-        startTelemetryHeartbeat()
-    }
-
     fun toggleHardwareSimulation(enabled: Boolean) {
         _isSimulatedHardware.value = enabled
+        if (enabled) {
+            _connectionState.value = BleConnectionState.CONNECTED_STREAMING
+            _connectedRadioNode.value = MeshNode(
+                nodeId = "!7a9f1b2c",
+                longName = "Silouder Master Heltec V3",
+                shortName = "SLDR",
+                role = NodeRole.ROUTER,
+                hardwareModel = HardwareModel.HELTEC_V3,
+                snr = 9.8f,
+                rssi = -64,
+                batteryLevel = 94,
+                voltage = 4.18f,
+                channelUtilization = 8.5f,
+                isBleConnectedRadio = true,
+                latitude = 37.7749,
+                longitude = -122.4194,
+                altitude = 42
+            )
+            startTelemetryHeartbeat()
+        } else {
+            disconnect()
+        }
     }
 
     fun updateModemConfig(newConfig: RadioModemConfig) {

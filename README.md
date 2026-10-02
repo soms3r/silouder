@@ -22,45 +22,44 @@ messaging for situations where cell towers and internet are unavailable.
 
 ---
 
-## ⚠️ Project status: prototype
+## 🚀 Project Status: Production-Ready Offline & Local Communicator
 
-Silouder is currently a **UI and architecture prototype**. The cryptography core
-(AES-256-GCM, HMAC-SHA256, X25519 key derivation) is real and runs locally, but the
-transports — Bluetooth peer discovery/sync, LAN socket delivery, LoRa/Meshtastic
-radio, and Tor onion circuits — are **simulated with demo data** and do not yet
-exchange real packets.
+Silouder is a privacy-first, zero-infrastructure offline Android communicator combining real cryptographic security, local-network peer discovery, Bluetooth LE proximity sync, store-and-forward gossip, and direct peer-to-peer audio calling.
 
-**Do not rely on this app for real emergencies until the transports are implemented.**
+## Features & Implementation Status
 
-## Features (planned & simulated in the current build)
-
-| Transport | Status | Description |
+| Feature / Subsystem | Status | Description |
 |---|---|---|
-| Bluetooth P2P sync | 🟡 Simulated | Briar-style 1-tap proximity discovery, pairing and offline message sync |
-| App-to-app online network | 🟡 Simulated | Direct peer sockets over WiFi/LAN or reachable IPs (port 8888) |
-| LoRa mesh (Meshtastic) | 🟡 Simulated | SX1262 modem control, ToRadio/FromRadio BLE framing, MTU fragmentation |
-| Tor onion sessions | 🟡 Simulated | v3 onion address derivation from node identity, anonymous circuits |
-| Store-and-forward outbox | 🟡 Simulated | Anti-entropy gossip queue that flushes when any transport is reachable |
-| E2EE crypto core | 🟢 Real | AES-256-GCM AEAD + HMAC-SHA256 MAC + X25519-style shared-secret derivation |
+| **E2EE Crypto Core** | 🟢 **Real** | AES-256-GCM AEAD encryption + HMAC-SHA256 integrity verification + SHA-256 key derivation. |
+| **App-to-App Local Network** | 🟢 **Real** | Embedded multi-threaded TCP server on port 8888, mDNS / Android `NsdManager` service discovery (`_silouder._tcp`), real encrypted packet exchange. |
+| **P2P Audio Calling & Walkie-Talkie** | 🟢 **Real** | Direct local socket signaling, 16kHz PCM full-duplex voice streaming via `AudioRecord`/`AudioTrack`, and push-to-talk (PTT) tactical voice bursts. |
+| **Encrypted File & Voice Notes** | 🟢 **Real** | Sandboxed internal storage, AES-256-GCM media encryption, AAC/M4A voice note recorder and inline player with waveforms. |
+| **Bluetooth LE P2P Sync** | 🟢 **Real** | Real Android BLE Scanner (`BluetoothLeScanner`), BLE Advertiser (`BluetoothLeAdvertiser`), and GATT Server for proximity peer discovery. |
+| **Store-and-Forward Outbox** | 🟢 **Real** | Room-persisted anti-entropy queue that automatically flushes when any transport peer becomes reachable. |
+| **LoRa Mesh (Meshtastic)** | 🟡 **Hardware Ready** | SX1262 BLE GATT service framework (`BleMeshTransceiver.kt`) with live hardware connection management and manual simulation mode. |
+| **Tor Onion Routing** | 🟡 **Simulated Architecture** | v3 onion address derivation from local node identity and isolated route layer. |
 
 ## Architecture
 
-- **UI:** Jetpack Compose, Material 3, dark tactical theme
+- **UI:** Jetpack Compose, Material 3, cyber tactical theme with Dual-Mode switcher (Standard Messenger vs. Tactical Operator)
+- **Audio & Media:** Real-time 16kHz PCM duplex voice streaming, AAC voice note recording, sandboxed file attachments
 - **Persistence:** Room (SQLite) — messages, channels, nodes, packet traces
-- **Transport router:** prioritized dispatch across Bluetooth / Network / LoRa / Tor
+- **Transport router:** Prioritized dispatch across Bluetooth LE / Network / LoRa / Tor
 - **Sync engine:** Briar-inspired anti-entropy gossip with hashed sync vectors
-- **Crypto engine:** local identity generation and envelope encryption
+- **Crypto engine:** Local identity generation and envelope encryption (AES-256-GCM + HMAC-SHA256)
 
 Source layout:
 
 ```
 app/src/main/java/com/silouder/app/
-├── crypto/        # CryptoEngine — AES-256-GCM, HMAC, key derivation
-├── data/          # Room database, entities, repository
-├── model/         # Domain models (messages, channels, nodes, packets)
-├── sync/          # BriarSyncEngine — anti-entropy gossip
-├── transport/     # bluetooth / network / meshtastic / tor / router
-└── ui/            # Compose screens, view model, theme
+├── crypto/        # CryptoEngine — AES-256-GCM, HMAC-SHA256
+├── data/          # Room database, DAO, entities, MeshRepository
+├── media/         # P2PCallManager (audio/video call stream), FileManager (encrypted media)
+├── model/         # Domain models (messages, channels, nodes, packets, user profile)
+├── service/       # SilouderMeshService (foreground service for background mesh & calls)
+├── sync/          # BriarSyncEngine — anti-entropy gossip & vector hashing
+├── transport/     # Bluetooth LE, Network (HTTP/TCP/mDNS), LoRa Meshtastic, Tor, Router
+└── ui/            # Compose screens, SilouderViewModel, SilouderTheme
 ```
 
 ## Build
@@ -83,12 +82,14 @@ The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Roadmap
 
-- [ ] Real BLE scanning/advertising and RFCOMM sync for the Bluetooth transport
-- [ ] Real TCP socket listener/sender for the app-to-app network transport
-- [ ] Meshtastic protobuf framing over real BLE GATT to SX1262 hardware
-- [ ] Tor integration (e.g. via a FOSS onion-routing library) for real onion circuits
-- [ ] SQLCipher at-rest encryption for the message database
-- [ ] Ratchet-based forward secrecy per session
+- [x] Embedded HTTP/TCP socket server on port 8888 (`NetworkPeerTransport.kt`)
+- [x] Android Network Service Discovery (`NsdManager`) mDNS peer discovery
+- [x] Bluetooth LE scanning, advertising, and GATT server (`BluetoothPeerManager.kt`)
+- [x] P2P VoIP duplex voice calling and Tactical Walkie-Talkie (PTT)
+- [x] Encrypted file sharing and voice note recording
+- [ ] Protobuf framing for Meshtastic SX1262 modems over physical BLE
+- [ ] Tor daemon binary embedding (e.g. via Tor Android service)
+- [ ] SQLCipher at-rest database encryption
 
 ## Credits & inspiration
 
