@@ -58,13 +58,79 @@ body {
   overflow-x: hidden;
   position: relative;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 10% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 90% 60%, rgba(168, 85, 247, 0.05) 0%, transparent 40%);
+    radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 10% 30%, rgba(16, 185, 129, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 60%, rgba(168, 85, 247, 0.04) 0%, transparent 40%);
   background-attachment: fixed;
 }
 
-/* Background Cyber Grid */
+/* ==========================================================================
+   Tactical Animated Texture Background System
+   ========================================================================== */
+
+/* 1. Ambient Shifting Auroras */
+.aurora-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.aurora-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.18;
+  animation: floatAurora 22s ease-in-out infinite alternate;
+}
+
+.aurora-cyan {
+  top: -15%;
+  left: 20%;
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, #00F0FF, transparent 70%);
+}
+
+.aurora-purple {
+  top: 35%;
+  right: -10%;
+  width: 48vw;
+  height: 48vw;
+  background: radial-gradient(circle, #A855F7, transparent 70%);
+  animation-delay: -7s;
+  animation-duration: 26s;
+}
+
+.aurora-emerald {
+  bottom: -20%;
+  left: 10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, #10B981, transparent 70%);
+  animation-delay: -14s;
+  animation-duration: 30s;
+}
+
+@keyframes floatAurora {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(35px, -30px) scale(1.12); }
+  100% { transform: translate(-30px, 25px) scale(0.94); }
+}
+
+/* 2. Tactical Mesh Canvas */
+.tactical-mesh-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 3. Animated Drifting Cyber Grid */
 .cyber-grid-overlay {
   position: fixed;
   top: 0;
@@ -72,11 +138,36 @@ body {
   width: 100vw;
   height: 100vh;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(rgba(0, 240, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridDrift 28s linear infinite;
   pointer-events: none;
   z-index: 0;
+}
+
+@keyframes gridDrift {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+/* 4. Tactical Scanline CRT Texture */
+.tactical-scanline-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.12),
+    rgba(0, 0, 0, 0.12) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
 }
 
 .container {
@@ -283,6 +374,88 @@ header.site-header {
   background: var(--bg-highlight);
   border-color: var(--cyber-cyan-dim);
   color: var(--cyber-cyan);
+}
+
+/* F-Droid Tactical Distribution Button */
+.btn-fdroid {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--text-primary);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.btn-fdroid:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #38BDF8;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
+  transform: translateY(-2px);
+  color: #FFFFFF;
+}
+
+.fdroid-svg-icon {
+  color: #38BDF8;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.btn-fdroid:hover .fdroid-svg-icon {
+  transform: scale(1.1);
+}
+
+.btn-fdroid-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.btn-fdroid-sub {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.btn-fdroid-main {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #F8FAFC;
+  font-family: var(--font-sans);
+}
+
+.badge-coming-soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #FBBF24;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F59E0B;
+  box-shadow: 0 0 8px #F59E0B;
+  animation: pulse 1.8s infinite;
 }
 
 .hero-meta-badges {
@@ -698,6 +871,166 @@ header.site-header {
   color: var(--cyber-cyan);
 }
 
+/* Download Action Groups */
+.download-buttons-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 10px 0 24px;
+}
+
+.btn-large-dl {
+  padding: 12px 24px;
+  text-align: left;
+}
+
+.btn-large-dl .btn-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-main-label {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.btn-sub-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.85;
+  letter-spacing: 0.4px;
+}
+
+/* F-Droid Status Notification Callout */
+.fdroid-notice-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  padding: 18px 24px;
+  margin: 28px auto 10px;
+  max-width: 680px;
+  text-align: left;
+  backdrop-filter: blur(10px);
+  transition: all 0.35s ease;
+}
+
+.fdroid-notice-card.highlight-pulse {
+  border-color: #38BDF8;
+  box-shadow: 0 0 32px rgba(56, 189, 248, 0.45);
+  transform: scale(1.02);
+}
+
+.fdroid-notice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fdroid-notice-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fdroid-notice-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #38BDF8;
+  letter-spacing: 1px;
+}
+
+.fdroid-status-pill {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #FBBF24;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+
+.fdroid-notice-card p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Tactical Notification Toast */
+.tactical-toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid #38BDF8;
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.35);
+  backdrop-filter: blur(14px);
+  color: #F1F5F9;
+  padding: 16px 22px;
+  border-radius: var(--radius-md);
+  z-index: 1000;
+  max-width: 420px;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  animation: slideToast 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideToast {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.tactical-toast-icon {
+  color: #38BDF8;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tactical-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tactical-toast-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #38BDF8;
+  letter-spacing: 0.8px;
+}
+
+.tactical-toast-msg {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.tactical-toast-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  margin-left: auto;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.tactical-toast-close:hover {
+  color: #FFFFFF;
+}
+
 /* Sideload Guide 3-step cards */
 .steps-grid {
   display: grid;
@@ -894,4 +1227,22 @@ footer.site-footer {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 640px) {
+  .download-buttons-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  .btn-large-dl, .btn-fdroid {
+    width: 100%;
+    justify-content: center;
+  }
+  .tactical-toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
+}
+
 
